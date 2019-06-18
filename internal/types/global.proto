@@ -1,0 +1,46 @@
+syntax = "proto3";
+
+package types;
+
+message WSNumber {
+  double value = 1;
+}
+
+message WSData {
+  string id = 1;
+  string name = 2;
+  WSNumber value = 3;
+  WSNumber range_low = 4;
+  WSNumber range_high = 5;
+  WSNumber warning_low = 6;
+  WSNumber warning_high = 7;
+  uint32 warning_ignore_count = 8;
+  WSNumber error_low = 9;
+  WSNumber error_high = 10;
+  uint32 error_ignore_count = 11;
+}
+
+enum AlarmState {
+  Overflow = 0;
+  Underflow = 1;
+  AutoCanceled = 2;
+  ManualCanceled = 3;
+}   
+
+message SAlarmInfo {
+  string id = 1;
+  AlarmState state = 2;
+  WSNumber value = 3;
+  WSNumber bound = 4;
+  int64 time = 5;
+}
+
+message WSByteArray {
+  bytes data = 1;
+}
+
+message RedisMessage {
+  string from = 1;
+  string to = 2;
+  WSByteArray data = 3;
+}

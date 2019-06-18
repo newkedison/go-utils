@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package types;
+
+message CommunicateData {
+  enum EDirection {
+    Send = 0;
+    Recv = 1;
+  }
+  uint32 index = 1;
+  EDirection direction = 2;
+  int64 time_point = 3;
+  bytes data = 4;
+}
+
+message SummaryData {
+  uint32 send_packs = 1;
+  uint32 send_bytes = 2;
+  uint32 recv_packs = 3;
+  uint32 recv_bytes = 4;
+  uint32 error_count = 5;
+  uint32 queue_size = 6;
+  repeated CommunicateData buffer = 7;
+}
+
+message IPCMessage {
+  uint32 seq_no = 1;
+  uint32 identify = 2;
+  string title = 3;
+  bytes data = 4;
+}
