@@ -99,13 +99,20 @@ func (ba *ByteArray) AssignByCopy(data []byte) {
 	*ba = append(ByteArray{}, data...)
 }
 
-// MarshalBinary implements the encoding.BinaryMarshaler interface.
-func (ba ByteArray) MarshalBinary() (_ []byte, err error) {
-	defer SetErrorWhenMarshalObjectErrorPanic("common.ByteArray", &err)()
-	p := &types.WSByteArray{
-		Data: []byte(ba),
+func (ba *ByteArray) ToProtoMessage() *types.WSByteArray {
+	return &types.WSByteArray{
+		Data: []byte(*ba),
 	}
-	return MarshalProtoMessage(p)
+}
+
+func (ba *ByteArray) FromProtoMessage(p *types.WSByteArray) {
+	*ba = ByteArray(p.Data)
+}
+
+// MarshalBinary implements the encoding.BinaryMarshaler interface.
+func (ba *ByteArray) MarshalBinary() (_ []byte, err error) {
+	defer SetErrorWhenMarshalObjectErrorPanic("common.ByteArray", &err)()
+	return MarshalProtoMessage(ba.ToProtoMessage())
 }
 
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
@@ -119,7 +126,7 @@ func (ba *ByteArray) UnmarshalBinaryWithSize(data []byte) (_ int, err error) {
 	defer SetErrorWhenUnmarshalObjectErrorPanic("common.ByteArray", &err)()
 	var result types.WSByteArray
 	used := UnmarshalProtoMessage(data, &result)
-	*ba = ByteArray(result.Data)
+	ba.FromProtoMessage(&result)
 	return used, nil
 }
 

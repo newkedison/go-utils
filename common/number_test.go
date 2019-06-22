@@ -19,9 +19,9 @@ func TestFloat64Epsilon(t *testing.T) {
 
 func TestNewNumber(t *testing.T) {
 	assert := assert.New(t)
-	n := common.NewNumber(byte(3))
+	n := *common.NewNumber(byte(3))
 	assert.EqualValues(n, 3)
-	n = common.NewNumber(1.23)
+	n = *common.NewNumber(1.23)
 	assert.EqualValues(n, 1.23)
 	assert.Panics(func() { common.NewNumber("string is not allow") })
 	assert.Panics(func() { common.NewNumber(common.MaxIntNumber + 1) })
@@ -259,22 +259,22 @@ func TestNumberToFloat64(t *testing.T) {
 
 func TestNumberCompare(t *testing.T) {
 	assert := assert.New(t)
-	assert.True(common.NewNumber(0) < 1)
-	assert.True(common.NewNumber(0) == 0.0)
-	assert.False(common.NewNumber(0.0) > 1)
+	assert.True(*common.NewNumber(0) < 1)
+	assert.True(*common.NewNumber(0) == 0.0)
+	assert.False(*common.NewNumber(0.0) > 1)
 }
 
 func TestNumberCalculate(t *testing.T) {
 	assert := assert.New(t)
-	assert.EqualValues(common.NewNumber(1)+1, 2)
-	assert.EqualValues(2*common.NewNumber(1)+common.NewNumber(2.2)/common.NewNumber(2), 3.1)
+	assert.EqualValues(*common.NewNumber(1)+1, 2)
+	assert.EqualValues(2*(*common.NewNumber(1))+(*common.NewNumber(2.2))/(*common.NewNumber(2)), 3.1)
 }
 
 func TestNumberToString(t *testing.T) {
 	assert := assert.New(t)
-	assert.Equal(fmt.Sprint(common.NewNumber(0.1)), "0.1")
-	assert.Equal(fmt.Sprint(common.NewNumber(2.0)), "2")
-	assert.Equal(fmt.Sprintf("%.2f", common.NewNumber(1)), "1.00")
+	assert.Equal(fmt.Sprint(*common.NewNumber(0.1)), "0.1")
+	assert.Equal(fmt.Sprint(*common.NewNumber(2.0)), "2")
+	assert.Equal(fmt.Sprintf("%.2f", *common.NewNumber(1)), "1.00")
 	assert.Equal(fmt.Sprintf("%02d", common.NewNumber(1).ToUint32()), "01")
 }
 

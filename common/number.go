@@ -31,7 +31,7 @@ func Float64Epsilon() float64 {
 	return math.Nextafter(1.0, 2.0) - 1.0
 }
 
-func NewNumber(d interface{}) Number {
+func NewNumber(d interface{}) *Number {
 	switch v := d.(type) {
 	case int64:
 		if v > MaxIntNumber {
@@ -55,7 +55,8 @@ func NewNumber(d interface{}) Number {
 		}
 	}
 	if reflect.TypeOf(d).ConvertibleTo(NumberType) {
-		return reflect.ValueOf(d).Convert(NumberType).Interface().(Number)
+		result := reflect.ValueOf(d).Convert(NumberType).Interface().(Number)
+		return &result
 	}
 	panic("Invalid number type")
 }
@@ -104,13 +105,20 @@ func (v Number) ToFloat64() float64 {
 	return float64(v)
 }
 
-// MarshalBinary implements the encoding.BinaryMarshaler interface.
-func (v Number) MarshalBinary() (_ []byte, err error) {
-	defer SetErrorWhenMarshalObjectErrorPanic("common.Number", &err)()
-	p := &types.WSNumber{
+func (v *Number) ToProtoMessage() *types.WSNumber {
+	return &types.WSNumber{
 		Value: v.ToFloat64(),
 	}
-	return MarshalProtoMessage(p)
+}
+
+func (v *Number) FromProtoMessage(p *types.WSNumber) {
+	*v = Number(p.Value)
+}
+
+// MarshalBinary implements the encoding.BinaryMarshaler interface.
+func (v *Number) MarshalBinary() (_ []byte, err error) {
+	defer SetErrorWhenMarshalObjectErrorPanic("common.Number", &err)()
+	return MarshalProtoMessage(v.ToProtoMessage())
 }
 
 // UnmarshalBinary implements the encoding.BinaryUnmarshaler interface.
@@ -124,6 +132,6 @@ func (v *Number) UnmarshalBinaryWithSize(data []byte) (_ int, err error) {
 	defer SetErrorWhenUnmarshalObjectErrorPanic("common.Number", &err)()
 	var result types.WSNumber
 	used := UnmarshalProtoMessage(data, &result)
-	*v = Number(result.Value)
+	v.FromProtoMessage(&result)
 	return used, nil
 }
